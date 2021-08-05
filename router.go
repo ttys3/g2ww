@@ -19,7 +19,7 @@ func GwStat(c echo.Context) error {
 	return c.String(http.StatusOK, statMsg)
 }
 
-func GwWorker(c echo.Context) error {
+func ProxyWebhook(c echo.Context) error {
 	var h GrafanaAlertMsg
 	if err := c.Bind(&h); err != nil {
 		zap.S().Errorw("error parsing json", "err", err)
