@@ -1,28 +1,51 @@
 package main
 
 import (
+	"go.uber.org/zap"
 	"os"
 
-	"github.com/gofiber/compression"
-	"github.com/gofiber/fiber"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
 
-	app := fiber.New()
+	initLog()
 
+	// Echo instance
+	e := echo.New()
+
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	e.Use(middleware.BodyDump(func(c echo.Context, reqBody, resBody []byte) {
+		zap.S().Infow("begin body dump", "req", reqBody, "rsp", resBody)
+	}))
+
+	// Route => handler
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello, World!\n")
+	})
+
+	e.GET("/healthz", func(c echo.Context) error {
+		return c.String(http.StatusOK, "ok")
+	})
+
+	e.GET("/stat", GwStat)
+
+	e.Any("/:key", GwWorker)
+
+	// Start server
 	var ListenAddress string
 	if os.Getenv("DOCKER") != "" {
 		ListenAddress = "0.0.0.0:2408"
 	} else {
 		ListenAddress = "127.0.0.1:2408"
 	}
-
-	// Server Info
-	app.Use(compression.New())
-	app.Get("/", GwStat())
-	app.All("/:key", GwWorker())
-
-	app.Listen(ListenAddress)
+	zap.S().Infow("http server starting", "listen_addr", ListenAddress)
+	e.Logger.Fatal(e.Start(ListenAddress))
 
 }
