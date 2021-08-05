@@ -22,7 +22,7 @@ func main() {
 	e.Use(middleware.Recover())
 
 	e.Use(middleware.BodyDump(func(c echo.Context, reqBody, resBody []byte) {
-		zap.S().Infow("begin body dump", "req", reqBody, "rsp", resBody)
+		zap.S().Infow("begin body dump", "req", string(reqBody), "rsp", string(resBody))
 	}))
 
 	// Route => handler
