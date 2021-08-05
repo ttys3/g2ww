@@ -71,8 +71,7 @@ type MarkdownMsg struct {
 const MsgTemplate = `
 Status: %s
 Title: %s
-Message: %s
-Value: %s
+Description: %s
 PanelURL: [点此查看面板图](%s)
 State: %s
 `
@@ -86,7 +85,7 @@ func SendWebhook(key string, h *GrafanaAlertMsg) (*WechatWorkWebhookRsp, error) 
 	msg := MarkdownMsg{
 		Msgtype: "markdown",
 		Markdown: MsgContent{
-			Content: fmt.Sprintf(MsgTemplate, h.Status, h.Title, h.CommonAnnotations.Description, h.Alerts[0].ValueString, h.Alerts[0].PanelURL, h.State),
+			Content: fmt.Sprintf(MsgTemplate, h.Status, h.Title, h.CommonAnnotations.Description, h.Alerts[0].PanelURL, h.State),
 		},
 	}
 	jsonStr, err := json.Marshal(msg)
