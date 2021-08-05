@@ -17,6 +17,7 @@ type GrafanaAlertItem struct {
 		To        string `json:"to"`
 	} `json:"labels"`
 	Annotations struct {
+		Summary     string `json:"summary"`
 		Description string `json:"description"`
 	} `json:"annotations"`
 	StartsAt     time.Time `json:"startsAt"`
@@ -34,19 +35,19 @@ type CommonAnnotations struct {
 }
 
 type GrafanaAlertMsg struct {
-	Receiver string `json:"receiver"`
-	Status   string `json:"status"`
-	Alerts   []GrafanaAlertItem`json:"alerts"`
-	Grouplabels map[string]string `json:"groupLabels"`
-	Commonlabels map[string]string `json:"commonLabels"`
-	CommonAnnotations CommonAnnotations `json:"commonAnnotations"`
-	Externalurl     string `json:"externalURL"`
-	Version         string `json:"version"`
-	Groupkey        string `json:"groupKey"`
-	Truncatedalerts int    `json:"truncatedAlerts"`
-	Title           string `json:"title"`
-	State           string `json:"state"`
-	Message         string `json:"message"`
+	Receiver          string             `json:"receiver"`
+	Status            string             `json:"status"`
+	Alerts            []GrafanaAlertItem `json:"alerts"`
+	Grouplabels       map[string]string  `json:"groupLabels"`
+	Commonlabels      map[string]string  `json:"commonLabels"`
+	CommonAnnotations CommonAnnotations  `json:"commonAnnotations"`
+	Externalurl       string             `json:"externalURL"`
+	Version           string             `json:"version"`
+	Groupkey          string             `json:"groupKey"`
+	Truncatedalerts   int                `json:"truncatedAlerts"`
+	Title             string             `json:"title"`
+	State             string             `json:"state"`
+	Message           string             `json:"message"`
 }
 
 // {"errcode":0,"errmsg":"ok"}
@@ -64,7 +65,7 @@ type MsgContent struct {
 }
 
 type MarkdownMsg struct {
-	Msgtype  string `json:"msgtype"`
+	Msgtype  string     `json:"msgtype"`
 	Markdown MsgContent `json:"markdown"`
 }
 
@@ -85,7 +86,7 @@ func SendWebhook(key string, h *GrafanaAlertMsg) (*WechatWorkWebhookRsp, error) 
 	msg := MarkdownMsg{
 		Msgtype: "markdown",
 		Markdown: MsgContent{
-			Content: fmt.Sprintf(MsgTemplate, h.Status, h.Title, h.CommonAnnotations.Description, h.Alerts[0].PanelURL, h.State),
+			Content: fmt.Sprintf(MsgTemplate, h.Status, h.Title, h.Alerts[0].Annotations.Description, h.Alerts[0].PanelURL, h.State),
 		},
 	}
 	jsonStr, err := json.Marshal(msg)
