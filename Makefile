@@ -1,5 +1,7 @@
-BIN = g2ww	
-IMAGE = g2ww:latest
+TAG = $(shell git describe --always --tags --abbrev=0 | tr -d "[v\r\n]")
+
+BIN = g2ww
+IMAGE = g2ww:$(TAG)
 
 build:
 	CGO_ENABLED=0 go build --ldflags "-s -w" -o $(BIN) .
